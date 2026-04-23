@@ -1,0 +1,52 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --bg:       #0d0d0f;
+  --surface:  #16181e;
+  --border:   #2a2d38;
+  --text:     #c8cad4;
+  --text-dim: #6b6e80;
+  --accent:   #5b9cf6;
+  --mono:     ui-monospace, "Cascadia Code", Consolas, monospace;
+  --sans:     system-ui, "Segoe UI", Roboto, sans-serif;
+  font: 13px/1.5 var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+body { margin: 0; }
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3 { margin: 0; font-weight: 500; }
+
+input, select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 4px;
+  padding: 3px 6px;
+  font: inherit;
+  font-size: 12px;
+}
+
+input[type="range"] {
+  padding: 0;
+  border: none;
+  accent-color: var(--accent);
+}
+
+input[type="number"] { width: 60px; }
+
+pre {
+  margin: 0;
+  font: 11px/1.6 var(--mono);
+  color: var(--text-dim);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
