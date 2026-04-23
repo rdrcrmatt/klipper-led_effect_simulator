@@ -2,6 +2,10 @@
 
 A browser-based simulator for [klipper-led_effect](https://github.com/julianschill/klipper-led_effect) by Julian Schill. Design and preview LED effects for your Klipper 3D printer — no printer required.
 
+**[Try it live →](https://rdrcrmatt.github.io/klipper-led_effect_simulator/)**
+
+![Simulator screenshot](docs/screenshot.png)
+
 The simulation engine runs entirely in the browser via [Pyodide](https://pyodide.org) (Python compiled to WebAssembly), so no server or local installation is needed.
 
 ---
