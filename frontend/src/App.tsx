@@ -13,6 +13,13 @@ import {
   FALLBACK_EFFECTS,
   FALLBACK_BLENDING,
 } from "./utils/layerConfig";
+import {
+  readShareParam,
+  decodeState,
+  buildShareUrl,
+  makeShareableState,
+  stripsFromShareable,
+} from "./utils/shareState";
 import "./App.css";
 
 let _stripSeq = 0;
@@ -28,19 +35,38 @@ function defaultStrip(index = 0): Strip {
   };
 }
 
+// Decode share param once at module load (before any React state)
+const _sharedState = (() => {
+  const param = readShareParam();
+  return param ? decodeState(param) : null;
+})();
+
 export default function App() {
   const { connected, initData, latestFrame, frameCount, sendConfig, sendState } =
     useSimulator();
 
   // ---------------------------------------------------------------- //
-  // Strips state                                                       //
+  // Display controls — initialized from share state if present        //
   // ---------------------------------------------------------------- //
 
-  const [strips, setStrips] = useState<Strip[]>([defaultStrip(0)]);
+  const [shape,    setShape]    = useState<DotShape>(_sharedState?.shape    ?? "Circle");
+  const [ledSize,  setLedSize]  = useState(          _sharedState?.ledSize  ?? 14);
+  const [distance, setDistance] = useState(          _sharedState?.distance ?? 36);
+  const [ledType,  setLedType]  = useState<LedType>( _sharedState?.ledType  ?? "RGB");
 
-  const skipNextInit = useRef(false);
+  // ---------------------------------------------------------------- //
+  // Strips state — initialized from share state if present            //
+  // ---------------------------------------------------------------- //
 
-  // On connect / reconnect, sync strips from backend
+  const [strips, setStrips] = useState<Strip[]>(() =>
+    _sharedState ? stripsFromShareable(_sharedState.strips) : [defaultStrip(0)]
+  );
+
+  // Skip the first initData sync if we loaded from a share link
+  // (we'll push our own config once connected instead)
+  const skipNextInit = useRef(_sharedState !== null);
+
+  // On connect / reconnect, sync strips from backend (unless overridden)
   useEffect(() => {
     if (!initData) return;
     if (skipNextInit.current) { skipNextInit.current = false; return; }
@@ -79,6 +105,13 @@ export default function App() {
     sendState(printerState);
   };
 
+  // When Pyodide finishes loading, push share-state config to the engine
+  useEffect(() => {
+    if (!connected || !_sharedState) return;
+    pushConfig(strips, _sharedState.ledType);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connected]);
+
   // ---------------------------------------------------------------- //
   // Strip handlers                                                    //
   // ---------------------------------------------------------------- //
@@ -107,7 +140,6 @@ export default function App() {
   };
 
   const handleStripRotationChange = (id: string, rotation: Rotation) => {
-    // Rotation is visual-only — no backend push needed
     setStrips((prev) => prev.map((s) => (s.id === id ? { ...s, rotation } : s)));
   };
 
@@ -130,18 +162,25 @@ export default function App() {
     sendState(patch);
   };
 
-  // ---------------------------------------------------------------- //
-  // Display controls (local — canvas only)                           //
-  // ---------------------------------------------------------------- //
-
-  const [shape, setShape]       = useState<DotShape>("Circle");
-  const [ledSize, setLedSize]   = useState(14);
-  const [distance, setDistance] = useState(36);
-  const [ledType, setLedType]   = useState<LedType>("RGB");
-
   const handleLedTypeChange = (t: LedType) => {
     setLedType(t);
     pushConfig(strips, t);
+  };
+
+  // ---------------------------------------------------------------- //
+  // Share                                                             //
+  // ---------------------------------------------------------------- //
+
+  const [shareCopied, setShareCopied] = useState(false);
+
+  const handleShare = () => {
+    const url = buildShareUrl(
+      makeShareableState(strips, ledType, shape, ledSize, distance)
+    );
+    navigator.clipboard.writeText(url).then(() => {
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    });
   };
 
   // ---------------------------------------------------------------- //
@@ -184,6 +223,14 @@ export default function App() {
         <span className={`status-pill ${connected ? "on" : "off"}`}>
           {connected ? "● ready" : "○ loading…"}
         </span>
+        <div className="header-spacer" />
+        <button
+          className={`share-btn${shareCopied ? " copied" : ""}`}
+          onClick={handleShare}
+          title="Copy shareable link to clipboard"
+        >
+          {shareCopied ? "✓ Copied!" : "⎘ Share"}
+        </button>
       </header>
 
       <div className="app-body">

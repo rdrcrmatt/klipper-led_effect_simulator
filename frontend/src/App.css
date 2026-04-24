@@ -31,6 +31,22 @@
 .status-pill.on  { color: #4ade80; border-color: #4ade8055; }
 .status-pill.off { color: #f87171; border-color: #f8717155; }
 
+.header-spacer { flex: 1; }
+
+.share-btn {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.share-btn:hover { border-color: var(--accent); color: var(--accent); }
+.share-btn.copied { border-color: #4ade80; color: #4ade80; }
+
 .app-body {
   display: flex;
   flex: 1;
