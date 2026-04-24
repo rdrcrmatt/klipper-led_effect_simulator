@@ -57,49 +57,6 @@ You can paste configs directly from your printer's `printer.cfg` and they will l
 
 ---
 
-## Setting up GitHub Pages
-
-1. Go to your repo → **Settings** → **Pages**
-2. Under **Source**, select **GitHub Actions**
-3. Create `.github/workflows/deploy.yml`:
-
-```yaml
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
-      - run: npm ci
-        working-directory: frontend
-      - run: npm run build
-        working-directory: frontend
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: frontend/dist
-      - uses: actions/deploy-pages@v4
-        id: deploy
-```
-
----
-
 ## Project structure
 
 ```
