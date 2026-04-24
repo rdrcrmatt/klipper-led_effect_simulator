@@ -1,3 +1,7 @@
+# led_effect.py is fetched at runtime from julianschill/klipper-led_effect
+backend/led_effect.py
+frontend/src/py/led_effect.py
+
 # Python
 backend/venv/
 __pycache__/

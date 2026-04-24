@@ -1,5 +1,11 @@
-import ledEffectCode from '../py/led_effect.py?raw';
 import klippermockCode from '../py/klippermock.py?raw';
+
+// led_effect.py is fetched directly from Julian Schill's klipper-led_effect repo.
+// Pinned to a specific commit for stability. To update, change the commit hash
+// below and verify the simulator still works with the new engine version.
+const LED_EFFECT_URL =
+  'https://raw.githubusercontent.com/julianschill/klipper-led_effect/' +
+  '0f118bd9c2292f6c00fb52dd416d06910908f524/src/led_effect.py';
 
 type InMessage =
   | { type: 'config'; strips: Array<{ led_count: number; layers: string | null }> }
@@ -106,6 +112,12 @@ _session = SessionManager()
 
 async function init() {
   try {
+    // Fetch led_effect.py directly from Julian Schill's repo
+    const ledEffectCode = await fetch(LED_EFFECT_URL).then((r) => {
+      if (!r.ok) throw new Error(`Failed to fetch led_effect.py: ${r.status}`);
+      return r.text();
+    });
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore – Pyodide loaded from CDN; no type declarations available
     const { loadPyodide } = await import(/* @vite-ignore */ 'https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.mjs');

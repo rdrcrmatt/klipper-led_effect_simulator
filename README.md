@@ -25,39 +25,9 @@ The simulation engine runs entirely in the browser via [Pyodide](https://pyodide
 
 ## Usage
 
-### Hosted (no setup)
+Just open the link above — no installation needed. The simulation engine loads entirely in your browser.
 
-> https://rdrcrmatt.github.io/klipper-led_effect_simulator/
-
-### Local development
-
-**Frontend only (Pyodide — recommended):**
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Open `http://localhost:5173`. Pyodide (~10 MB) loads from CDN on first visit; subsequent loads use the browser cache.
-
-**With Python backend (optional, for backend development):**
-
-```bash
-# Terminal 1 — backend
-cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-
-# Terminal 2 — frontend (proxy mode)
-cd frontend
-npm install
-npm run dev
-```
-
-The Vite dev server proxies `/ws` to the backend when configured. To re-enable the proxy, add it back to `vite.config.ts`.
+On first visit, the app fetches `led_effect.py` directly from [Julian Schill's klipper-led_effect repo](https://github.com/julianschill/klipper-led_effect) and caches it. No copy of the engine is bundled in this repo.
 
 ---
 
@@ -84,17 +54,6 @@ static    0 0 top (0,0,0.2)
 ```
 
 You can paste configs directly from your printer's `printer.cfg` and they will load immediately.
-
----
-
-## Building for production
-
-```bash
-cd frontend
-npm run build
-```
-
-Output is in `frontend/dist/`. The `base: './'` setting in `vite.config.ts` makes all asset paths relative, so the built files work when served from any subdirectory (including GitHub Pages).
 
 ---
 
@@ -145,18 +104,17 @@ jobs:
 
 ```
 klipper-led_effect_simulator/
-├── backend/                   # FastAPI WebSocket backend (optional)
+├── backend/                   # FastAPI WebSocket backend (for local dev only)
 │   ├── main.py                # WebSocket server + session management
-│   ├── led_effect.py          # klipper-led_effect engine (upstream)
 │   ├── klippermock.py         # Klipper API mock layer
 │   └── requirements.txt
 └── frontend/                  # React + TypeScript + Vite
     └── src/
         ├── py/
-        │   ├── led_effect.py  # Engine (copy of backend, loaded by Pyodide)
-        │   └── klippermock.py # Mock layer (copy of backend, loaded by Pyodide)
+        │   └── klippermock.py        # Klipper API mock layer (loaded by Pyodide)
+        │   # led_effect.py is fetched at runtime from julianschill/klipper-led_effect
         ├── worker/
-        │   └── simulator.worker.ts   # Web Worker: Pyodide + frame loop
+        │   └── simulator.worker.ts   # Web Worker: fetches engine, runs Pyodide
         ├── hooks/
         │   └── useSimulator.ts       # React hook wrapping the worker
         ├── components/
