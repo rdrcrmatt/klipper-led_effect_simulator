@@ -1,10 +1,11 @@
 import { useState } from "react";
-import type { Layer } from "../types";
-import { newLayer, hexToFloatColor } from "../utils/layerConfig";
+import type { Layer, LedType } from "../types";
+import { newLayer, hexToFloatColor, normalizeHex, blendedDisplayColor } from "../utils/layerConfig";
 import { HelpModal } from "./HelpModal";
 
 type Props = {
   layers: Layer[];
+  ledType: LedType;
   availableEffects: string[];
   blendingModes: string[];
   onChange: (layers: Layer[]) => void;
@@ -16,19 +17,33 @@ type Props = {
 
 function PaletteEditor({
   palette,
+  ledType,
   onChange,
 }: {
   palette: string[];
+  ledType: LedType;
   onChange: (p: string[]) => void;
 }) {
-  const update = (i: number, hex: string) => {
+  const updateRgb = (i: number, rgbHex: string) => {
     const next = [...palette];
-    next[i] = hex;
+    const current = normalizeHex(next[i] ?? "#000000");
+    // Keep existing W byte, replace RGB
+    next[i] = rgbHex + current.slice(7);
     onChange(next);
   };
+
+  const updateW = (i: number, pct: number) => {
+    const next = [...palette];
+    const current = normalizeHex(next[i] ?? "#000000");
+    const wByte = Math.round(Math.min(100, Math.max(0, pct)) * 2.55)
+      .toString(16).padStart(2, "0");
+    next[i] = current.slice(0, 7) + wByte;
+    onChange(next);
+  };
+
   const remove = (i: number) => onChange(palette.filter((_, idx) => idx !== i));
-  const add = () => onChange([...palette, "#ffffff"]);
-  const move = (i: number, dir: -1 | 1) => {
+  const add    = () => onChange([...palette, "#ffffff00"]);
+  const move   = (i: number, dir: -1 | 1) => {
     const next = [...palette];
     [next[i], next[i + dir]] = [next[i + dir], next[i]];
     onChange(next);
@@ -37,30 +52,52 @@ function PaletteEditor({
   return (
     <div className="palette-editor">
       <div className="palette-swatches">
-        {palette.map((hex, i) => (
-          <div key={i} className="swatch-cell">
-            <label
-              className="color-swatch"
-              style={{ background: hex }}
-              title={hexToFloatColor(hex)}
-            >
-              <input
-                type="color"
-                value={hex}
-                onChange={(e) => update(i, e.target.value)}
-              />
-            </label>
-            <div className="swatch-btns">
-              <button disabled={i === 0} onClick={() => move(i, -1)}>↑</button>
-              <button disabled={i === palette.length - 1} onClick={() => move(i, 1)}>↓</button>
-              <button
-                className="btn-danger"
-                disabled={palette.length <= 1}
-                onClick={() => remove(i)}
-              >×</button>
+        {palette.map((hex, i) => {
+          const h      = normalizeHex(hex);
+          const rgbHex = h.slice(0, 7);
+          const wPct   = Math.round(parseInt(h.slice(7, 9), 16) / 2.55);
+
+          return (
+            <div key={i} className="swatch-cell">
+              <label
+                className="color-swatch"
+                style={{ background: blendedDisplayColor(h) }}
+                title={hexToFloatColor(h)}
+              >
+                <input
+                  type="color"
+                  value={rgbHex}
+                  onChange={(e) => updateRgb(i, e.target.value)}
+                />
+              </label>
+
+              {ledType === "RGBW" && (
+                <div className="swatch-w-row">
+                  <span className="swatch-w-label">W</span>
+                  <input
+                    type="number"
+                    className="swatch-w-input"
+                    min={0}
+                    max={100}
+                    value={wPct}
+                    onChange={(e) => updateW(i, parseInt(e.target.value) || 0)}
+                  />
+                  <span className="swatch-w-unit">%</span>
+                </div>
+              )}
+
+              <div className="swatch-btns">
+                <button disabled={i === 0} onClick={() => move(i, -1)}>↑</button>
+                <button disabled={i === palette.length - 1} onClick={() => move(i, 1)}>↓</button>
+                <button
+                  className="btn-danger"
+                  disabled={palette.length <= 1}
+                  onClick={() => remove(i)}
+                >×</button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       <button className="btn-add-color" onClick={add}>+ color</button>
     </div>
@@ -75,7 +112,11 @@ function MiniPalette({ palette }: { palette: string[] }) {
   return (
     <span className="mini-palette">
       {palette.slice(0, 5).map((hex, i) => (
-        <span key={i} className="mini-swatch" style={{ background: hex }} />
+        <span
+          key={i}
+          className="mini-swatch"
+          style={{ background: blendedDisplayColor(hex) }}
+        />
       ))}
       {palette.length > 5 && (
         <span className="mini-more">+{palette.length - 5}</span>
@@ -88,7 +129,7 @@ function MiniPalette({ palette }: { palette: string[] }) {
 // Main component                                                       //
 // ------------------------------------------------------------------ //
 
-export function LayerEditor({ layers, availableEffects, blendingModes, onChange }: Props) {
+export function LayerEditor({ layers, ledType, availableEffects, blendingModes, onChange }: Props) {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(
     layers.length > 0 ? 0 : null
   );
@@ -229,6 +270,7 @@ export function LayerEditor({ layers, availableEffects, blendingModes, onChange 
             <h3>Palette</h3>
             <PaletteEditor
               palette={selected.palette}
+              ledType={ledType}
               onChange={(p) => updateLayer(sel, { palette: p })}
             />
           </div>

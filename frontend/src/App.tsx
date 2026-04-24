@@ -70,11 +70,11 @@ export default function App() {
   // Config push                                                       //
   // ---------------------------------------------------------------- //
 
-  const pushConfig = (nextStrips: Strip[]) => {
+  const pushConfig = (nextStrips: Strip[], type: LedType = ledType) => {
     skipNextInit.current = true;
     sendConfig(nextStrips.map((s) => ({
       led_count: s.count,
-      layers: serializeLayers(s.layers),
+      layers: serializeLayers(s.layers, type),
     })));
     sendState(printerState);
   };
@@ -138,6 +138,11 @@ export default function App() {
   const [ledSize, setLedSize]   = useState(14);
   const [distance, setDistance] = useState(36);
   const [ledType, setLedType]   = useState<LedType>("RGB");
+
+  const handleLedTypeChange = (t: LedType) => {
+    setLedType(t);
+    pushConfig(strips, t);
+  };
 
   // ---------------------------------------------------------------- //
   // Sidebar resize                                                    //
@@ -215,7 +220,7 @@ export default function App() {
             onShapeChange={setShape}
             onLedSizeChange={setLedSize}
             onDistanceChange={setDistance}
-            onLedTypeChange={setLedType}
+            onLedTypeChange={handleLedTypeChange}
           />
         </div>
       </div>

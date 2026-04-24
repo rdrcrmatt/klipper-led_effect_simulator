@@ -547,6 +547,30 @@
   pointer-events: none;
 }
 
+/* W channel input (visible in RGBW mode) */
+.swatch-w-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+.swatch-w-label {
+  font-size: 9px;
+  color: var(--text-dim);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+.swatch-w-input {
+  width: 34px;
+  padding: 1px 3px;
+  font-size: 10px;
+  text-align: right;
+}
+.swatch-w-unit {
+  font-size: 9px;
+  color: var(--text-dim);
+}
+
 .swatch-btns {
   display: flex;
   gap: 1px;

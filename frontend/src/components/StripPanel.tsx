@@ -91,12 +91,13 @@ export function StripPanel({
           </div>
           <LayerEditor
             layers={layers}
+            ledType={ledType}
             availableEffects={availableEffects}
             blendingModes={blendingModes}
             onChange={onLayersChange}
           />
           <ConfigPanel
-            layersText={serializeLayers(layers)}
+            layersText={serializeLayers(layers, ledType)}
             onLoad={onLayersTextLoad}
             label={`Strip ${index + 1} Layers Config`}
           />

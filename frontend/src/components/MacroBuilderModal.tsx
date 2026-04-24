@@ -19,7 +19,7 @@ export function MacroBuilderModal({ strips, ledType, onClose }: Props) {
   const groups = useMemo(() => {
     const seen = new Map<string, Strip[]>();
     for (const strip of strips) {
-      const sig = serializeLayers(strip.layers);
+      const sig = serializeLayers(strip.layers, ledType);
       if (!seen.has(sig)) seen.set(sig, []);
       seen.get(sig)!.push(strip);
     }
