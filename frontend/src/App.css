@@ -194,11 +194,18 @@
   flex-shrink: 0;
 }
 .stepper-val {
-  min-width: 30px;
+  width: 42px;
   text-align: center;
   font-size: 12px;
   color: var(--text);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 4px;
 }
+.stepper-val::-webkit-inner-spin-button,
+.stepper-val::-webkit-outer-spin-button { -webkit-appearance: none; }
+.stepper-val { -moz-appearance: textfield; }
 
 /* ---- Seg row: stack count stepper + rotation vertically ---- */
 .seg-controls {

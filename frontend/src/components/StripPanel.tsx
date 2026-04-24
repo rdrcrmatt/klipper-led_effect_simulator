@@ -49,7 +49,17 @@ export function StripPanel({
         <div className="strip-header-controls" onClick={(e) => e.stopPropagation()}>
           <div className="stepper">
             <button onClick={() => onCountChange(Math.max(1, count - 1))} disabled={count <= 1}>−</button>
-            <span className="stepper-val">{count}</span>
+            <input
+              className="stepper-val"
+              type="number"
+              value={count}
+              min={1}
+              max={500}
+              onChange={(e) => {
+                const v = parseInt(e.target.value);
+                if (!isNaN(v)) onCountChange(Math.min(500, Math.max(1, v)));
+              }}
+            />
             <button onClick={() => onCountChange(Math.min(500, count + 1))}>+</button>
           </div>
           {canRemove && (
