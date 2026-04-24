@@ -27,7 +27,7 @@ The simulation engine runs entirely in the browser via [Pyodide](https://pyodide
 
 ### Hosted (no setup)
 
-> GitHub Pages link coming soon — see [Setting up GitHub Pages](#setting-up-github-pages) below.
+> https://rdrcrmatt.github.io/klipper-led_effect_simulator/
 
 ### Local development
 
