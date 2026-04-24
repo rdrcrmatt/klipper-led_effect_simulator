@@ -1,5 +1,7 @@
 import type { Rotation } from "./utils/ledLayout";
 
+export type LedType = "RGB" | "RGBW";
+
 export type Layer = {
   id: string;
   active: boolean;

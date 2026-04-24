@@ -69,6 +69,7 @@ class SessionManager:
                         min(255, int(255.0 * ledframe[j * _COLORS])),
                         min(255, int(255.0 * ledframe[j * _COLORS + 1])),
                         min(255, int(255.0 * ledframe[j * _COLORS + 2])),
+                        min(255, int(255.0 * ledframe[j * _COLORS + 3])),
                     ]
                     for j in range(led_count)
                 ]

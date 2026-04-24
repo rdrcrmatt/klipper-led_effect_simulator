@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { DotShape, Rotation } from "../utils/ledLayout";
-import type { Layer, Strip } from "../types";
+import type { Layer, Strip, LedType } from "../types";
 import type { SimState } from "../hooks/useSimulator";
 import { StripPanel } from "./StripPanel";
 import { MacroBuilderModal } from "./MacroBuilderModal";
@@ -10,6 +10,7 @@ type Props = {
   shape: DotShape;
   ledSize: number;
   distance: number;
+  ledType: LedType;
   availableEffects: string[];
   blendingModes: string[];
   frameCount: number;
@@ -25,6 +26,7 @@ type Props = {
   onShapeChange: (s: DotShape) => void;
   onLedSizeChange: (n: number) => void;
   onDistanceChange: (n: number) => void;
+  onLedTypeChange: (t: LedType) => void;
 };
 
 const SHAPES: DotShape[] = ["Circle", "Square"];
@@ -39,16 +41,17 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 }
 
 export function SimControls({
-  strips, shape, ledSize, distance,
+  strips, shape, ledSize, distance, ledType,
   availableEffects, blendingModes, frameCount,
   printerState, onPrinterStateChange,
   onAddStrip, onRemoveStrip, onStripNameChange,
   onStripCountChange, onStripRotationChange,
   onStripLayersChange, onStripLayersTextLoad,
-  onShapeChange, onLedSizeChange, onDistanceChange,
+  onShapeChange, onLedSizeChange, onDistanceChange, onLedTypeChange,
 }: Props) {
   const totalLeds = strips.reduce((a, s) => a + s.count, 0);
   const [showMacro, setShowMacro] = useState(false);
+  const [showLedTypeHelp, setShowLedTypeHelp] = useState(false);
 
   return (
     <aside className="controls">
@@ -76,9 +79,55 @@ export function SimControls({
         </Row>
       </section>
 
+      {/* ---- LED Type ------------------------------------------ */}
+      <section className="led-type-section">
+        <div className="led-type-header">
+          <h3>LED Type</h3>
+          <button
+            className="led-type-help-btn"
+            onClick={() => setShowLedTypeHelp((v) => !v)}
+            title="About LED type"
+          >?</button>
+        </div>
+        {showLedTypeHelp && (
+          <div className="led-type-help">
+            <p>
+              Select <strong>RGB</strong> for standard 3-channel LEDs (e.g. WS2812B),
+              or <strong>RGBW</strong> for 4-channel LEDs with a dedicated white element
+              (e.g. SK6812 RGBW).
+            </p>
+            <p>
+              The actual color order (GRB, GRBW, RGB, etc.) is set in your Klipper
+              neopixel device definition — <code>color_order:</code> — not here.
+              All strips share the same device configuration.
+            </p>
+          </div>
+        )}
+        <div className="led-type-radios">
+          {(["RGB", "RGBW"] as LedType[]).map((t) => (
+            <label key={t} className={`led-type-radio${ledType === t ? " active" : ""}`}>
+              <input
+                type="radio"
+                name="ledType"
+                value={t}
+                checked={ledType === t}
+                onChange={() => onLedTypeChange(t)}
+              />
+              {t}
+            </label>
+          ))}
+        </div>
+      </section>
+
       {/* ---- Strips -------------------------------------------- */}
       <section className="strips-section">
-        {showMacro && <MacroBuilderModal strips={strips} onClose={() => setShowMacro(false)} />}
+        {showMacro && (
+          <MacroBuilderModal
+            strips={strips}
+            ledType={ledType}
+            onClose={() => setShowMacro(false)}
+          />
+        )}
         <div className="strips-header">
           <h3>Strips <span className="strips-total">({totalLeds} LEDs total)</span></h3>
           <div style={{ display: "flex", gap: 4 }}>
@@ -96,6 +145,7 @@ export function SimControls({
               count={strip.count}
               rotation={strip.rotation}
               layers={strip.layers}
+              ledType={ledType}
               availableEffects={availableEffects}
               blendingModes={blendingModes}
               canRemove={strips.length > 1}

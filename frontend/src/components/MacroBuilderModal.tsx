@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import type { Strip } from "../types";
+import type { Strip, LedType } from "../types";
 import { serializeLayers } from "../utils/layerConfig";
 
 type Props = {
   strips: Strip[];
+  ledType: LedType;
   onClose: () => void;
 };
 
-export function MacroBuilderModal({ strips, onClose }: Props) {
+export function MacroBuilderModal({ strips, ledType, onClose }: Props) {
   const [macroName,    setMacroName]    = useState("my_effect_macro");
   const [neopixelName, setNeopixelName] = useState("my_leds");
   const [frameRate,    setFrameRate]    = useState(24);
@@ -53,7 +54,26 @@ export function MacroBuilderModal({ strips, onClose }: Props) {
 
   // Generated klipper config
   const generatedConfig = useMemo(() => {
-    const lines: string[] = [];
+    const totalLeds = strips.reduce((a, s) => a + s.count, 0);
+    const colorOrder = ledType === "RGBW" ? "GRBW" : "GRB";
+
+    const lines: string[] = [
+      `# ── Neopixel device ─────────────────────────────────────────────`,
+      `# Configure this section to match your hardware, then include it`,
+      `# in your printer.cfg (or paste directly into printer.cfg).`,
+      `#`,
+      `# [neopixel ${neopixelName}]`,
+      `# pin:                    <your data pin>`,
+      `# chain_count:            ${totalLeds}`,
+      `# color_order:            ${colorOrder}   # set by your LED hardware, not by this simulator`,
+      `# initial_RED:            0.0`,
+      `# initial_GREEN:          0.0`,
+      `# initial_BLUE:           0.0`,
+      ...(ledType === "RGBW" ? [`# initial_WHITE:           0.0`] : []),
+      ``,
+      `# ── LED effects ─────────────────────────────────────────────────`,
+      ``,
+    ];
     const effectList: string[] = [];
 
     for (const { sig, groupStrips } of groups) {
@@ -87,7 +107,7 @@ export function MacroBuilderModal({ strips, onClose }: Props) {
     }
 
     return lines.join("\n");
-  }, [groups, effectNames, stripRanges, neopixelName, macroName, frameRate, autostart]);
+  }, [groups, effectNames, stripRanges, strips, neopixelName, macroName, frameRate, autostart, ledType]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };

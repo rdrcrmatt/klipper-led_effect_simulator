@@ -1,12 +1,12 @@
 import { useState } from "react";
-import type { Layer } from "../types";
+import type { Layer, LedType } from "../types";
 import type { Rotation } from "../utils/ledLayout";
 import { serializeLayers } from "../utils/layerConfig";
 import { LayerEditor } from "./LayerEditor";
 import { ConfigPanel } from "./ConfigPanel";
 
 const ROTATIONS: Rotation[] = [0, 90, 180, 270];
-const WARN_THRESHOLD = 125;
+const WARN_THRESHOLD = { RGB: 166, RGBW: 125 };
 
 type Props = {
   index: number;
@@ -14,6 +14,7 @@ type Props = {
   count: number;
   rotation: Rotation;
   layers: Layer[];
+  ledType: LedType;
   availableEffects: string[];
   blendingModes: string[];
   canRemove: boolean;
@@ -26,11 +27,11 @@ type Props = {
 };
 
 export function StripPanel({
-  index, name, count, rotation, layers, availableEffects, blendingModes,
+  index, name, count, rotation, layers, ledType, availableEffects, blendingModes,
   canRemove, onNameChange, onCountChange, onRotationChange, onLayersChange, onLayersTextLoad, onRemove,
 }: Props) {
   const [expanded, setExpanded] = useState(index === 0);
-  const warn = count > WARN_THRESHOLD;
+  const warn = count > WARN_THRESHOLD[ledType];
 
   return (
     <div className={`strip-panel${expanded ? " expanded" : ""}`}>
@@ -70,7 +71,7 @@ export function StripPanel({
 
       {warn && (
         <div className="strip-warn-banner">
-          ⚠ klipper-led_effect supports max 125 RGBW or 166 RGB LEDs per data pin
+          ⚠ klipper-led_effect supports max {WARN_THRESHOLD[ledType]} {ledType} LEDs per data pin
         </div>
       )}
 

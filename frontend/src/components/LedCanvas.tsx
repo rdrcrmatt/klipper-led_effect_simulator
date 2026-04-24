@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import type { LedCoord, DotShape } from "../utils/ledLayout";
 import type { LedFrame } from "../hooks/useSimulator";
+import type { LedType } from "../types";
 
 type Props = {
   coordinates: LedCoord[];
   frame: LedFrame | null;
   shape: DotShape;
+  ledType: LedType;
   frameCount: number;
 };
 
@@ -53,7 +55,8 @@ function draw(
   canvas: HTMLCanvasElement,
   coordinates: LedCoord[],
   frame: LedFrame | null,
-  shape: DotShape
+  shape: DotShape,
+  ledType: LedType
 ) {
   const ctx = canvas.getContext("2d")!;
   const W = canvas.width;
@@ -73,8 +76,13 @@ function draw(
 
     const led = frame?.[i];
     if (led) {
-      ctx.fillStyle = `rgb(${led[0]},${led[1]},${led[2]})`;
-      ctx.shadowColor = `rgba(${led[0]},${led[1]},${led[2]},0.7)`;
+      // For RGBW, blend the white channel into each colour component
+      const w = ledType === "RGBW" ? (led[3] ?? 0) : 0;
+      const r = Math.min(255, led[0] + w);
+      const g = Math.min(255, led[1] + w);
+      const b = Math.min(255, led[2] + w);
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.shadowColor = `rgba(${r},${g},${b},0.7)`;
       ctx.shadowBlur = r * 2.5;
     } else {
       ctx.fillStyle = OFF_COLOR;
@@ -93,7 +101,7 @@ function draw(
   }
 }
 
-export function LedCanvas({ coordinates, frame, shape, frameCount }: Props) {
+export function LedCanvas({ coordinates, frame, shape, ledType, frameCount }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [size, setSize] = useState({ w: 300, h: 300 });
 
@@ -117,10 +125,10 @@ export function LedCanvas({ coordinates, frame, shape, frameCount }: Props) {
     if (!canvas) return;
     canvas.width  = size.w;
     canvas.height = size.h;
-    draw(canvas, coordinates, frame, shape);
+    draw(canvas, coordinates, frame, shape, ledType);
   // size changes require a full redraw; frameCount is the per-frame trigger
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [frameCount, coordinates, shape, size]);
+  }, [frameCount, coordinates, shape, ledType, size]);
 
   return (
     <canvas

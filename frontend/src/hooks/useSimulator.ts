@@ -12,7 +12,7 @@ export type InitData = {
   strips: StripConfig[];
 };
 
-export type LedFrame = [number, number, number][];
+export type LedFrame = [number, number, number, number][]; // R, G, B, W
 
 export type SimState = {
   stepper?: number;

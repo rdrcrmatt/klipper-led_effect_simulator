@@ -5,7 +5,7 @@ import { LedCanvas } from "./components/LedCanvas";
 import { SimControls } from "./components/SimControls";
 import { calcPathCoordinates } from "./utils/ledLayout";
 import type { DotShape, Rotation } from "./utils/ledLayout";
-import type { Layer, Strip } from "./types";
+import type { Layer, Strip, LedType } from "./types";
 import {
   parseLayersText,
   serializeLayers,
@@ -137,6 +137,7 @@ export default function App() {
   const [shape, setShape]       = useState<DotShape>("Circle");
   const [ledSize, setLedSize]   = useState(14);
   const [distance, setDistance] = useState(36);
+  const [ledType, setLedType]   = useState<LedType>("RGB");
 
   // ---------------------------------------------------------------- //
   // Sidebar resize                                                    //
@@ -186,6 +187,7 @@ export default function App() {
             coordinates={coordinates}
             frame={latestFrame}
             shape={shape}
+            ledType={ledType}
             frameCount={frameCount}
           />
         </main>
@@ -197,6 +199,7 @@ export default function App() {
             shape={shape}
             ledSize={ledSize}
             distance={distance}
+            ledType={ledType}
             availableEffects={availableEffects}
             blendingModes={blendingModes}
             frameCount={frameCount}
@@ -212,6 +215,7 @@ export default function App() {
             onShapeChange={setShape}
             onLedSizeChange={setLedSize}
             onDistanceChange={setDistance}
+            onLedTypeChange={setLedType}
           />
         </div>
       </div>
