@@ -174,6 +174,12 @@ klipper-led_effect_simulator/
 
 ---
 
+## License
+
+This project is licensed under the **GNU General Public License v3.0** — see the [LICENSE](LICENSE) file for details.
+
+Because this project incorporates [klipper-led_effect](https://github.com/julianschill/klipper-led_effect) (GPLv3), the simulator is required to be distributed under the same license. You are free to use, modify, and redistribute this code, provided any derivative works are also published under the GPLv3.
+
 ## Credits
 
 - **[klipper-led_effect](https://github.com/julianschill/klipper-led_effect)** by Julian Schill — the LED effect engine this simulator is built around
