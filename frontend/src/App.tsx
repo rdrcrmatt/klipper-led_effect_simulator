@@ -31,6 +31,7 @@ function defaultStrip(index = 0): Strip {
     name: `Strip ${index + 1}`,
     count: 30,
     rotation: 0,
+    reversed: false,
     layers: parseLayersText(DEFAULT_LAYERS_TEXT),
   };
 }
@@ -76,6 +77,7 @@ export default function App() {
         name: `Strip ${i + 1}`,
         count: s.led_count,
         rotation: 0 as Rotation,
+        reversed: false,
         layers: parseLayersText(s.layers ?? DEFAULT_LAYERS_TEXT),
       }))
     );
@@ -143,6 +145,11 @@ export default function App() {
     setStrips((prev) => prev.map((s) => (s.id === id ? { ...s, rotation } : s)));
   };
 
+  const handleStripReversedChange = (id: string, reversed: boolean) => {
+    // Reversed is visual + config-output only; no worker push needed
+    setStrips((prev) => prev.map((s) => (s.id === id ? { ...s, reversed } : s)));
+  };
+
   const handleStripLayersChange = (id: string, layers: Layer[]) => {
     const next = strips.map((s) => (s.id === id ? { ...s, layers } : s));
     setStrips(next);
@@ -208,7 +215,7 @@ export default function App() {
   // ---------------------------------------------------------------- //
 
   const coordinates = useMemo(
-    () => calcPathCoordinates(ledSize, distance, strips.map((s) => ({ count: s.count, rotation: s.rotation }))),
+    () => calcPathCoordinates(ledSize, distance, strips.map((s) => ({ count: s.count, rotation: s.rotation, reversed: s.reversed }))),
     [strips, ledSize, distance]
   );
 
@@ -262,6 +269,7 @@ export default function App() {
             onStripNameChange={handleStripNameChange}
             onStripCountChange={handleStripCountChange}
             onStripRotationChange={handleStripRotationChange}
+            onStripReversedChange={handleStripReversedChange}
             onStripLayersChange={handleStripLayersChange}
             onStripLayersTextLoad={handleStripLayersTextLoad}
             onShapeChange={setShape}

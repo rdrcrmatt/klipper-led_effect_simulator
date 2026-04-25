@@ -21,6 +21,7 @@ type Props = {
   onStripNameChange: (id: string, name: string) => void;
   onStripCountChange: (id: string, count: number) => void;
   onStripRotationChange: (id: string, r: Rotation) => void;
+  onStripReversedChange: (id: string, reversed: boolean) => void;
   onStripLayersChange: (id: string, layers: Layer[]) => void;
   onStripLayersTextLoad: (id: string, text: string) => void;
   onShapeChange: (s: DotShape) => void;
@@ -45,7 +46,7 @@ export function SimControls({
   availableEffects, blendingModes, frameCount,
   printerState, onPrinterStateChange,
   onAddStrip, onRemoveStrip, onStripNameChange,
-  onStripCountChange, onStripRotationChange,
+  onStripCountChange, onStripRotationChange, onStripReversedChange,
   onStripLayersChange, onStripLayersTextLoad,
   onShapeChange, onLedSizeChange, onDistanceChange, onLedTypeChange,
 }: Props) {
@@ -145,6 +146,7 @@ export function SimControls({
               count={strip.count}
               rotation={strip.rotation}
               layers={strip.layers}
+              reversed={strip.reversed}
               ledType={ledType}
               availableEffects={availableEffects}
               blendingModes={blendingModes}
@@ -152,6 +154,7 @@ export function SimControls({
               onNameChange={(name) => onStripNameChange(strip.id, name)}
               onCountChange={(count) => onStripCountChange(strip.id, count)}
               onRotationChange={(r) => onStripRotationChange(strip.id, r)}
+              onReversedChange={(rev) => onStripReversedChange(strip.id, rev)}
               onLayersChange={(layers) => onStripLayersChange(strip.id, layers)}
               onLayersTextLoad={(text) => onStripLayersTextLoad(strip.id, text)}
               onRemove={() => onRemoveStrip(strip.id)}

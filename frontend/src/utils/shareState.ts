@@ -20,6 +20,7 @@ export type ShareableState = {
     name: string;
     count: number;
     rotation: Rotation;
+    reversed: boolean;
     layers: Array<{
       active: boolean;
       effect: string;
@@ -74,6 +75,7 @@ export function stripToShareable(s: Strip): ShareableState["strips"][number] {
     name: s.name,
     count: s.count,
     rotation: s.rotation,
+    reversed: s.reversed,
     layers: s.layers.map(({ active, effect, rate, cutoff, blending, palette }) => ({
       active, effect, rate, cutoff, blending, palette,
     })),
@@ -112,6 +114,7 @@ export function stripsFromShareable(
     name: s.name,
     count: s.count,
     rotation: s.rotation,
+    reversed: s.reversed ?? false,
     layers: s.layers.map((l) => ({ ...l, id: generateLayerId() })),
   }));
 }

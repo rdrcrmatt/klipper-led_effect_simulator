@@ -13,6 +13,7 @@ type Props = {
   name: string;
   count: number;
   rotation: Rotation;
+  reversed: boolean;
   layers: Layer[];
   ledType: LedType;
   availableEffects: string[];
@@ -21,14 +22,17 @@ type Props = {
   onNameChange: (name: string) => void;
   onCountChange: (count: number) => void;
   onRotationChange: (r: Rotation) => void;
+  onReversedChange: (reversed: boolean) => void;
   onLayersChange: (layers: Layer[]) => void;
   onLayersTextLoad: (text: string) => void;
   onRemove: () => void;
 };
 
 export function StripPanel({
-  index, name, count, rotation, layers, ledType, availableEffects, blendingModes,
-  canRemove, onNameChange, onCountChange, onRotationChange, onLayersChange, onLayersTextLoad, onRemove,
+  index, name, count, rotation, reversed, layers, ledType,
+  availableEffects, blendingModes,
+  canRemove, onNameChange, onCountChange, onRotationChange, onReversedChange,
+  onLayersChange, onLayersTextLoad, onRemove,
 }: Props) {
   const [expanded, setExpanded] = useState(index === 0);
   const warn = count > WARN_THRESHOLD[ledType];
@@ -88,6 +92,14 @@ export function StripPanel({
                 >{r}°</button>
               ))}
             </div>
+            <label className="reverse-label" title="Reverses the LED index order — matches the reversed range syntax in klipper-led_effect (e.g. 30-1)">
+              <input
+                type="checkbox"
+                checked={reversed}
+                onChange={(e) => onReversedChange(e.target.checked)}
+              />
+              Reverse
+            </label>
           </div>
           <LayerEditor
             layers={layers}

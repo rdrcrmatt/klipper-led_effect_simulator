@@ -440,6 +440,19 @@
   width: 58px;
 }
 
+.reverse-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-dim);
+  cursor: pointer;
+  margin-left: auto;
+  user-select: none;
+  white-space: nowrap;
+}
+.reverse-label input[type="checkbox"] { cursor: pointer; }
+
 /* ---- Layer editor ---- */
 .layer-editor {
   display: flex;

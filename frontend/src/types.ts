@@ -9,7 +9,7 @@ export type Layer = {
   rate: number;
   cutoff: number;
   blending: string;
-  palette: string[]; // hex strings: "#rrggbb"
+  palette: string[]; // hex strings: "#rrggbbww"
 };
 
 export type Strip = {
@@ -17,5 +17,6 @@ export type Strip = {
   name: string;
   count: number;
   rotation: Rotation;
+  reversed: boolean;
   layers: Layer[];
 };

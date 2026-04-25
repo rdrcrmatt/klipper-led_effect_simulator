@@ -86,9 +86,12 @@ export function MacroBuilderModal({ strips, ledType, onClose }: Props) {
       lines.push("leds:");
 
       const ranges = groupStrips
-        .map((s) => stripRanges[s.id])
+        .map((s) => {
+          const r = stripRanges[s.id];
+          if (!r) return null;
+          return s.reversed ? `${r.end}-${r.start}` : `${r.start}-${r.end}`;
+        })
         .filter(Boolean)
-        .map((r) => `${r.start}-${r.end}`)
         .join(",");
       lines.push(`    neopixel:${neopixelName} (${ranges})`);
 
