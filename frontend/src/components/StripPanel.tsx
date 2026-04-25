@@ -4,6 +4,7 @@ import type { Rotation } from "../utils/ledLayout";
 import { serializeLayers } from "../utils/layerConfig";
 import { LayerEditor } from "./LayerEditor";
 import { ConfigPanel } from "./ConfigPanel";
+import { DeferredNumberInput } from "./DeferredNumberInput";
 
 const ROTATIONS: Rotation[] = [0, 90, 180, 270];
 const WARN_THRESHOLD = { RGB: 166, RGBW: 125 };
@@ -54,16 +55,12 @@ export function StripPanel({
         <div className="strip-header-controls" onClick={(e) => e.stopPropagation()}>
           <div className="stepper">
             <button onClick={() => onCountChange(Math.max(1, count - 1))} disabled={count <= 1}>−</button>
-            <input
+            <DeferredNumberInput
               className="stepper-val"
-              type="number"
               value={count}
               min={1}
               max={500}
-              onChange={(e) => {
-                const v = parseInt(e.target.value);
-                if (!isNaN(v)) onCountChange(Math.min(500, Math.max(1, v)));
-              }}
+              onChange={(v) => onCountChange(Math.round(v))}
             />
             <button onClick={() => onCountChange(Math.min(500, count + 1))}>+</button>
           </div>

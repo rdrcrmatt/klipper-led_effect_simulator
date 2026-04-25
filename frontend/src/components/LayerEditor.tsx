@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Layer, LedType } from "../types";
 import { newLayer, hexToFloatColor, normalizeHex, blendedDisplayColor } from "../utils/layerConfig";
 import { HelpModal } from "./HelpModal";
+import { DeferredNumberInput } from "./DeferredNumberInput";
 
 type Props = {
   layers: Layer[];
@@ -74,13 +75,12 @@ function PaletteEditor({
               {ledType === "RGBW" && (
                 <div className="swatch-w-row">
                   <span className="swatch-w-label">W</span>
-                  <input
-                    type="number"
+                  <DeferredNumberInput
                     className="swatch-w-input"
+                    value={wPct}
                     min={0}
                     max={100}
-                    value={wPct}
-                    onChange={(e) => updateW(i, parseInt(e.target.value) || 0)}
+                    onChange={(v) => updateW(i, Math.round(v))}
                   />
                   <span className="swatch-w-unit">%</span>
                 </div>
@@ -229,27 +229,21 @@ export function LayerEditor({ layers, ledType, availableEffects, blendingModes, 
 
             <div className="ctrl-row">
               <label>Rate</label>
-              <input
-                type="number"
+              <DeferredNumberInput
                 min={0}
                 step={0.1}
                 value={selected.rate}
-                onChange={(e) =>
-                  updateLayer(sel, { rate: parseFloat(e.target.value) || 0 })
-                }
+                onChange={(v) => updateLayer(sel, { rate: v })}
               />
             </div>
 
             <div className="ctrl-row">
               <label>Cutoff</label>
-              <input
-                type="number"
+              <DeferredNumberInput
                 min={0}
                 step={0.1}
                 value={selected.cutoff}
-                onChange={(e) =>
-                  updateLayer(sel, { cutoff: parseFloat(e.target.value) || 0 })
-                }
+                onChange={(v) => updateLayer(sel, { cutoff: v })}
               />
             </div>
 

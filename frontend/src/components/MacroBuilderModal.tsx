@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Strip, LedType } from "../types";
 import { serializeLayers } from "../utils/layerConfig";
+import { DeferredNumberInput } from "./DeferredNumberInput";
 
 type Props = {
   strips: Strip[];
@@ -157,12 +158,12 @@ export function MacroBuilderModal({ strips, ledType, onClose }: Props) {
                 spellCheck={false}
               />
               <label style={{ marginLeft: 12 }}>FPS</label>
-              <input
-                type="number"
-                value={frameRate}
-                min={1} max={60}
-                onChange={(e) => setFrameRate(parseInt(e.target.value) || 24)}
+              <DeferredNumberInput
                 className="macro-number-input"
+                value={frameRate}
+                min={1}
+                max={60}
+                onChange={(v) => setFrameRate(Math.round(v))}
               />
               <label style={{ marginLeft: 12 }}>
                 <input
